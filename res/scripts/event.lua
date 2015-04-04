@@ -28,6 +28,12 @@ function Dispatcher:removeListener(f)
 	end
 end
 
+function Dispatcher:clear()
+	self.map = {}
+	self.list = {}
+	self.count = 0
+end
+
 function Dispatcher:__call(...)
 	for i=1, self.count do
 		if (self.list[i]) then

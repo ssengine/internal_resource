@@ -134,6 +134,7 @@ function Timer:cancel()
 end
 
 function rtAgent:setTimeout(f, delay)
+	assert(delay>=0, "Cannot call setTimeout with a negetive delay.")
 	local ret = {
 		list = self.list,
 		func = f,
@@ -145,6 +146,7 @@ function rtAgent:setTimeout(f, delay)
 end
 
 function rtAgent:setInterval(f, delay, rpt)
+	assert(delay>=0, "Cannot call setInterval with a negetive delay.")
 	local ret = {
 		list = self.list,
 		func = f,
@@ -161,17 +163,16 @@ function rtAgent:tick(dt)
 	if (self._paused) then
 		return
 	end
-	self._t = self._t + dt * self._ratio
-	self.onTick(dt, self._t)
-
 	local t = self._t
+	local endt = t + dt*self._ratio
 
 	while true do
 		local n = self.list[1]
-		if (not n or n.t > t) then
+		if (not n or n.t > endt) then
 			break
 		end
 		removeTimer(self.list, n)
+		self._t = n.t
 		n:func()
 		if (n.rpt) then
 			if (n.rpt ~= 1) then
@@ -183,6 +184,9 @@ function rtAgent:tick(dt)
 			end
 		end
 	end
+
+	self._t = endt
+	self.onTick(dt, self._t)
 end
 
 function rtAgent:getTime()
