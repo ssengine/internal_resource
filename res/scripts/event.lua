@@ -1,14 +1,11 @@
-local Dispatcher = {}
-Dispatcher.__index = Dispatcher
+local Class = require("oo").Class
 
-function Dispatcher.new()
-	local ret = {
-		map = {},
-		list = {},
-		count = 0
-	}
-	setmetatable(ret, Dispatcher)
-	return ret
+local Dispatcher = Class.new()
+
+function Dispatcher:__init()
+	self.map = {}
+	self.list = {}
+	self.count = 0
 end
 
 function Dispatcher:add(f)

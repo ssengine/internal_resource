@@ -1,24 +1,21 @@
 local bind = require("bind")
 local Dispatcher = require("event").Dispatcher
+local Class = require("oo").Class
 
-local rtAgent = {}
-rtAgent.__index = rtAgent
+local rtAgent = Class.new()
 
-rtAgent.name = "runtime.Agent"
-
-function rtAgent.new(parent)
-	local ret = {
-		_ratio = 1,
-		_t = 0,
-		onTick = Dispatcher.new(),
-		list = {}
-		-- parent = nil
-	}
-	setmetatable(ret, rtAgent)
+function rtAgent:__init(parent)
+	self._ratio = 1
+	self._t = 0
+	self.onTick = Dispatcher.new()
+	self.list = {}
 	if (parent) then
-		ret:setParent(parent)
+		self:setParent(parent)
 	end
-	return ret
+end
+
+function rtAgent:newAgent()
+	return rtAgent.new(self)
 end
 
 function rtAgent:setParent(parent)
