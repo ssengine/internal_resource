@@ -11,7 +11,7 @@ function Dispatcher.new()
 	return ret
 end
 
-function Dispatcher:addListener(f)
+function Dispatcher:add(f)
 	if (self.map[f]) then
 		self:removeListener(f)
 	end
@@ -19,14 +19,16 @@ function Dispatcher:addListener(f)
 	self.map[f] = self.count
 	self.list[self.count] = f
 end
+Dispatcher.addListener = Dispatcher.add
 
-function Dispatcher:removeListener(f)
+function Dispatcher:remove(f)
 	local i = self.map[f]
 	if (i) then
 		self.map[f] = nil
 		self.list[i] = nil
 	end
 end
+Dispatcher.removeListener = Dispatcher.remove
 
 function Dispatcher:clear()
 	self.map = {}
