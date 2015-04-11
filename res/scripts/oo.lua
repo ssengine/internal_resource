@@ -96,22 +96,14 @@ function Class:__init(args)
 	end
 
 	rawset(self, '__mt', makeMetatable(self))
+
+	self.__init = function()
+	end
 end
 
 function Class:extend(args)
-	local ret = Class.new(self)
-	for k,v in pairs(self.statics) do
-		ret.statics[k] = v
-	end
-	for k,v in pairs(self.getters) do
-		ret.getters[k] = v
-	end
-	for k,v in pairs(self.setters) do
-		ret.setters[k] = v
-	end
-	for k,v in pairs(self.inherts) do
-		ret.inherts[k] = v
-	end
+	local ret = Class.new(args)
+	ret:mixin(self)
 	rawset(ret, 'super', self)
 	return ret
 end
@@ -135,6 +127,42 @@ function Class:property(k, getter, setter)
 	self.setters[k] = setter
 end
 
+function Class:mixin(other)
+	for k,v in pairs(other.statics) do
+		self.statics[k] = self.statics[k] or v
+	end
+	for k,v in pairs(other.getters) do
+		self.getters[k] = self.getters[k] or v
+	end
+	for k,v in pairs(other.setters) do
+		self.setters[k] = self.setters[k] or v
+	end
+	for k,v in pairs(other.inherts) do
+		self.inherts[k] = v
+	end
+	for k,v in pairs(other.__mt) do
+		if (k ~= "__index" and k ~= "__newindex") then
+			self.__mt[k] = self.__mt[k] or v
+		end
+	end
+end
+
+local Interface = Class.new()
+
+function Interface:__init(methods)
+	self.methods = methods
+end
+
+function Class:implements(interface)
+	for i,v in ipairs(interface.methods) do
+		if (not self.statics[v]) then
+			-- TODO: make better error message.
+			error("Method "..v.." is not implemented.")
+		end
+	end
+end
+
 return {
-	Class = Class
+	Class = Class,
+	Interface = Interface
 }
