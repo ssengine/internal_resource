@@ -128,6 +128,9 @@ function Timer:cancel()
 	if (self.list) then
 		removeTimer(self.list, self)
 	end
+	if (self.rpt) then -- cancel interval timer
+		self.rpt = false
+	end
 end
 
 function rtAgent:setTimeout(f, delay)
