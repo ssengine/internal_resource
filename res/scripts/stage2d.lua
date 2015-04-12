@@ -128,7 +128,32 @@ function Node2D:transMatrix(rc)
 end
 
 local Camera2D = Class.new()
+function Camera2D:__init()
+	self:__initWithSize(display:getSize())
+end
+
+function Camera2D:__initWithSize(w, h)
+	self.width = w
+	self.height = h
+	self.x = 0
+	self.y = 0
+end
+
+function Camera2D:setPosition(x, y)
+	self.x = x
+	self.y = y
+end
+
+function Camera2D:fitScreen()
+end
+
+function Camera2D:setSize(w, h)
+	self.width = w
+	self.height = h
+end
+
 function Camera2D:enter()
+	r2d:loadOrtho2D(self.width, self.height, self.x, self.y)
 end
 
 function Camera2D:leave()
@@ -142,7 +167,7 @@ end
 
 function Stage2D:__call()
 	self:calc()
-	self.camera.enter()
+	self.camera:enter()
 	-- TODO: optimize walk, skip empty nodes.
 	self:walk(function(node)
 			node:enter()
@@ -150,7 +175,7 @@ function Stage2D:__call()
 		end, function(node)
 			node:leave()
 		end)
-	self.camera.leave()
+	self.camera:leave()
 end
 
 return {
