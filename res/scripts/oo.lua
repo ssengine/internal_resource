@@ -40,7 +40,7 @@ function makeMetatable(class)
 		end,
 		__newindex = function(t, k, v)
 			if (class.setters[k]) then
-				return class.setters[k](t)
+				return class.setters[k](t, v)
 			end
 			rawset(t,k,v)
 		end
