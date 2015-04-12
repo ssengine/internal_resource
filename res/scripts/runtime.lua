@@ -189,7 +189,10 @@ function rtAgent:tick(dt)
 	self.onTick(dt, self._t)
 end
 
-function rtAgent:getTime()
+function rtAgent:getTime(t)
+	if (t and not self._paused) then
+		return self._t + t * self._ratio
+	end
 	return self._t
 end
 
