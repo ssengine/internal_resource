@@ -15,8 +15,14 @@ function Node2D:__init(parent)
 	self._children = {}
 end
 
+local newChildMethods = {}
+
+function Node2D:__index1(k)
+	return newChildMethods[k]
+end
+
 -- hack: left "self" of parent as arguments of __init
-Node2D.newNode = Node2D.new
+newChildMethods.newNode = Node2D.new
 
 function Node2D:detach()
 	assert(self._parent, "Cannot detach a root node!")
@@ -104,6 +110,10 @@ Node2D:property("scale", function(self)
 		node2d.getScale(self._ptr, v)
 	end)
 
+function Node2D:calc()
+	node2d.calc(self._ptr)
+end
+
 function Node2D:enter()
 end
 
@@ -111,6 +121,10 @@ function Node2D:leave()
 end
 
 function Node2D:render()
+end
+
+function Node2D:transMatrix(rc)
+	node2d.transMatrix(self._ptr, rc or r2d)
 end
 
 local Camera2D = Class.new()
@@ -127,8 +141,9 @@ function Stage2D:__init()
 end
 
 function Stage2D:__call()
+	self:calc()
 	self.camera.enter()
-	-- TODO: optimize walk
+	-- TODO: optimize walk, skip empty nodes.
 	self:walk(function(node)
 			node:enter()
 			node:render()
@@ -138,11 +153,9 @@ function Stage2D:__call()
 	self.camera.leave()
 end
 
-Stage2D.Node2D = Node2D
-Stage2D.Camera2D = Camera2D
-
 return {
 	Stage2D = Stage2D,
 	Node2D = Node2D,
-	Camera2D = Camera2D
+	Camera2D = Camera2D,
+	newChildMethods = newChildMethods
 }

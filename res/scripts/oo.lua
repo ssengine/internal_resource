@@ -2,6 +2,8 @@ local metaMethods = {
 	__call = true,
 	__index = true,
 	__newindex = true,
+	__index1 = true,		-- override operator [] but don't effect default newindex
+	__newindex1 = true,
 	__add = true,
 	__sub = true,
 	__mul = true,
@@ -31,20 +33,26 @@ Class.setters = {}
 Class.inherts = {[Class] = true}
 
 function makeMetatable(class)
-	local mt = {
-		__index = function(t, k)
-			if (class.getters[k]) then
-				return class.getters[k](t)
-			end
-			return class.statics[k]
-		end,
-		__newindex = function(t, k, v)
-			if (class.setters[k]) then
-				return class.setters[k](t, v)
-			end
-			rawset(t,k,v)
+	local mt = {}
+	function mt.__index(t, k)
+		if (class.getters[k]) then
+			return class.getters[k](t)
 		end
-	}
+		if (class.statics[k]) then
+			return class.statics[k]
+		end
+		return mt.__index1 and mt.__index1(t, k)
+	end
+	function mt.__newindex(t, k, v)
+		if (class.setters[k]) then
+			return class.setters[k](t, v)
+		end
+		if (mt.__newindex1) then
+			return mt.__newindex1[k](t, k, v)
+		end
+		rawset(t,k,v)
+	end
+
 	return mt
 end
 
