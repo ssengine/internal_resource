@@ -30,10 +30,7 @@ function Node2D:detach()
 	self._root = node2d.detach(self._ptr);
 end
 
--- No actually remove for Node2D.
-Node2D.remove = Node2D.detach
-
-function enumChildren(self, key)
+local function enumChildren(self, key)
 	if (key) then
 		key = node2d.next(key._ptr)
 	else
@@ -46,7 +43,7 @@ function Node2D:children()
 	return enumChildren, self, nil
 end
 
-function enumDescendants(self, key)
+local function enumDescendants(self, key)
 	if (not key) then
 		return self
 	end
